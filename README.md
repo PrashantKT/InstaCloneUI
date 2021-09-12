@@ -3,7 +3,10 @@
 Instagram UI Design in Swift UI 
 
 
-![ezgif-7-635243ae00a1](https://user-images.githubusercontent.com/35359315/132986072-a5274c89-a7c8-49d8-9752-99fa46892c9e.gif)
+
+
+https://user-images.githubusercontent.com/35359315/132986258-a51378ba-0361-4675-89a8-2e4bac25aa17.mov
+
 
 
 ## Donation
