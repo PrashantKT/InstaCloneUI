@@ -15,8 +15,12 @@ struct ProfileView: View {
     
     @Environment(\.presentationMode) var presentationMode
 
+    @State private var topHeaderOffset :CGFloat = 0
+    
+    static let header_ScrollTopPadding:CGFloat = 12
+    
     var body: some View {
-        VStack {
+        VStack(spacing:0) {
             
             HeaderViewCommonView(handler: { (action) in
                 
@@ -29,8 +33,25 @@ struct ProfileView: View {
                 }
                 
             }, title: "Prashant", rightImage1: "bell", rightImage2: "circle.grid.2x2")
+           
             .padding([.horizontal])
-
+            .overlay(
+                GeometryReader { proxy -> Color in
+                    let width = proxy.frame(in: .global).minY
+                    print(width)
+                    
+                    DispatchQueue.main.async {
+                        if topHeaderOffset == 0 {
+                            topHeaderOffset = width
+                        }
+                    }
+                   return Color.clear
+                }
+                .frame(height: 0,alignment: .bottom)
+                ,alignment: .bottom
+            
+            )
+            
             ScrollView(.vertical, showsIndicators: false) {
                 
                 VStack(alignment: .leading){
@@ -122,7 +143,7 @@ struct ProfileView: View {
                         .opacity(isSuggestedExpanded ? 1: 0)
                         .padding(.top,20)
                         .padding([.horizontal])
-
+                    
                     
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack {
@@ -140,21 +161,28 @@ struct ProfileView: View {
                                         .background(Color.blue)
                                         .foregroundColor(Color.white)
                                         .clipShape(Circle())
-
+                                        
                                         .offset(x: 0, y: 0)
-
+                                    
                                 }
                             })
                         }
                     }
                     .padding([.horizontal])
-
-                    ProfileImageContainerView()
+                    
+                    
+                    ProfileImageContainerView(topHeaderOffset: $topHeaderOffset)
                         .padding(.top,20)
+                    
+                    
 
                 }
                                 
-            }// SCROLL
+            }
+            .padding(.top,ProfileView.header_ScrollTopPadding)
+            // SCROLL
+ 
+ 
         }// MAIN V STACK
         .padding([.vertical])
         .navigationBarHidden(true)
@@ -350,11 +378,32 @@ struct ProfileView: View {
 
 struct ProfileImageContainerView : View {
     @State private var selectedIndex = 0
+    @State private var segmentOffset:CGFloat = 0
+    @Binding var topHeaderOffset:CGFloat
     var body: some View {
         VStack(spacing:0) {
-            topSegmentControlView
-                .frame(height:50)
+            
+            GeometryReader { scrollOffset -> AnyView in
+                let offset = scrollOffset.frame(in:.global).minY
+                DispatchQueue.main.async {
+                    let diff =  offset - topHeaderOffset - ProfileView.header_ScrollTopPadding / 2
+                    
+                    self.segmentOffset = max(-diff,0)
+                }
                 
+               return AnyView(
+                    topSegmentControlView
+                        .frame(height:50)
+                        .background(Color.white)
+                        .offset(y:self.segmentOffset)
+
+                )
+            }
+            .frame(height:50)
+            .zIndex(4)
+            
+            
+            
             ZStack {
                 imageGalleryView
             }
