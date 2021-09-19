@@ -29,7 +29,8 @@ struct ProfileView: View {
                 }
                 
             }, title: "Prashant", rightImage1: "bell", rightImage2: "circle.grid.2x2")
-            
+            .padding([.horizontal])
+
             ScrollView(.vertical, showsIndicators: false) {
                 
                 VStack(alignment: .leading){
@@ -90,7 +91,8 @@ struct ProfileView: View {
                         .frame(maxWidth:.infinity)
                         
                     }
-                    
+                    .padding([.horizontal])
+
                     VStack(alignment: .leading,spacing:4) {
                         Text("Prashant Tukadiya , iOS and Swift Dev")
                             .fontWeight(.bold)
@@ -109,14 +111,17 @@ struct ProfileView: View {
                         
                     }
                     .padding(.top,20)
-                    
+                    .padding([.horizontal])
+
                     FollowingMessageView
                     .padding(.top,30)
-                    
+                        .padding([.horizontal])
+
                     suggestedForView
                         .frame(height:isSuggestedExpanded ? 220 : 0)
                         .opacity(isSuggestedExpanded ? 1: 0)
                         .padding(.top,20)
+                        .padding([.horizontal])
 
                     
                     ScrollView(.horizontal, showsIndicators: false) {
@@ -142,11 +147,16 @@ struct ProfileView: View {
                             })
                         }
                     }
+                    .padding([.horizontal])
+
+                    ProfileImageContainerView()
+                        .padding(.top,20)
+
                 }
                                 
             }// SCROLL
         }// MAIN V STACK
-        .padding()
+        .padding([.vertical])
         .navigationBarHidden(true)
     }
     
@@ -198,11 +208,12 @@ struct ProfileView: View {
             
             
             Button(action: {
-                
-                self.arraySuggestedUsers.removeAll(where: {$0 == name})
-                
-                if arraySuggestedUsers.isEmpty  {
-                    isSuggestedExpanded = false
+                withAnimation {
+                    self.arraySuggestedUsers.removeAll(where: {$0 == name})
+                    
+                    if arraySuggestedUsers.isEmpty  {
+                        isSuggestedExpanded = false
+                    }
                 }
                 
                 
@@ -331,6 +342,114 @@ struct ProfileView: View {
 
         }
 
+    }
+    
+   
+  
+}
+
+struct ProfileImageContainerView : View {
+    @State private var selectedIndex = 0
+    var body: some View {
+        VStack(spacing:0) {
+            topSegmentControlView
+                .frame(height:50)
+                
+            ZStack {
+                imageGalleryView
+            }
+        }
+    }
+    
+    var imageGalleryView : some View {
+        LazyVGrid(columns: Array(repeating: GridItem(.flexible(),spacing: 2), count: 3), alignment: .leading, spacing: 2) {
+            
+            ForEach(1..<80) { i in
+                GeometryReader {proxy in
+                    let width = proxy.frame(in: .global).width
+                    Image("sample\(4)")
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: width, height: 120)
+                        .cornerRadius(0)
+                    //                            .frame(height:120)
+                }
+                .frame(height:120)
+            }
+            
+        }
+    }
+    
+    var topSegmentControlView : some View {
+        GeometryReader { proxy in
+            
+            HStack(spacing:0) {
+                
+                Group {
+                    Button(action: {
+                        withAnimation {
+                            selectedIndex = 0
+                        }
+                    }, label: {
+                        
+                        Image(systemName: "rectangle.split.3x3")
+                    })
+                    Button(action: {
+                        withAnimation {
+                            selectedIndex = 1
+                        }
+                    }, label: {
+                        Image(systemName: "play.rectangle")
+                        
+                    })
+                    
+                    Button(action: {
+                        withAnimation {
+                            selectedIndex = 2
+                        }
+                    }, label: {
+                        Image(systemName: "bolt.circle")
+                        
+                    })
+                    
+                    Button(action: {
+                        withAnimation {
+                            selectedIndex = 3
+                        }
+                    }, label: {
+                        Image(systemName: "person.crop.square")
+                        
+                    })
+                    
+                }
+                .frame(height:40)
+                .frame(maxWidth:.infinity)
+                .font(.title2)
+                .foregroundColor(.primary)
+                .padding(.bottom,4)
+                
+                
+            }
+            .frame(maxWidth:.infinity,alignment: .leading)
+            .background(
+                
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Color.primary)
+                    
+                    .frame(height:3)
+                    .frame(width:                        proxy.frame(in: .local).width / 4,alignment: .leading)
+                    .offset(x:getOffset(totalWidth: proxy.frame(in: .local).width))
+                    
+                
+                ,alignment: .bottomLeading
+            )
+            
+        }
+
+    }
+    
+    func getOffset(totalWidth:CGFloat) -> CGFloat  {
+        return (totalWidth / 4)  * CGFloat(selectedIndex)
     }
 }
 
